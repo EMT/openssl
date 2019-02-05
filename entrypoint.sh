@@ -118,8 +118,14 @@ then
     -subj "$PUBLIC_SUBJ"
 
   # append public cn to subject alt names
-  echo "Appending to public.ext: DNS.1 = $PUBLIC_CN"
-  echo "DNS.1 = $PUBLIC_CN" >> public.ext
+  echo "Appending to public.ext:"
+  DNS=""
+  dnscount=0
+  for cn in ${PUBLIC_CN//;/ } ; do
+    dnscount=$((dnscount+1))
+    echo "DNS.$dnscount = $cn"
+    echo "DNS.$dnscount = $cn" >> public.ext
+  done
 
   echo "Generating certificate: $PUBLIC_NAME.crt"
   openssl x509 \
