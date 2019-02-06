@@ -11,6 +11,7 @@ then
   rm "$CERT_DIR/key.pem"
   rm "$CERT_DIR/chain.pem"
   rm "$CERT_DIR/fullchain.pem"
+  rm "$CERT_DIR/dhparam.pem"
 else
   echo "Not renewing. RENEW env var is: $RENEW"
 fi
@@ -162,6 +163,18 @@ then
   cat "$CERT_DIR/$PUBLIC_NAME.crt" "$CERT_DIR/chain.pem" > "$CERT_DIR/fullchain.pem"
 else
   echo "ENTRYPOINT: fullchain.pem already exists"
+fi
+
+if [ ! -f "$CERT_DIR/dhparam.pem" ] && [ $DHPARAMS == "yes" ]
+then
+  # generate dhparam.pem
+  openssl dhparam -dsaparam -out dhparam.pem 4096
+
+  # copy dhparam to volume
+  echo "Copying dhparam.pem to $CERT_DIR"
+  cp "dhparam.pem" "$CERT_DIR"
+else
+  echo "ENTRYPOINT: dhparam.pem already exists"
 fi
 
 # run command passed to docker run
